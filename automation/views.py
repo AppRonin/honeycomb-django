@@ -6,3 +6,6 @@ def home(request):
 
 def about(request):
     return render(request, 'automation/about.html')
+
+def login(request):
+    return render(request, 'automation/login.html')

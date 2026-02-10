@@ -21,7 +21,7 @@
     <div class="collapse navbar-collapse">
       <ul class="navbar-nav mx-auto">
         <li class="nav-item px-2">
-          <a class="nav-link fw-semibold" href="{% url 'home' %}">Home</a>
+          <a href="{% url 'home' %}" class="nav-link fw-semibold">Home</a>
         </li>
 
         <li class="nav-item dropdown px-2">
@@ -42,7 +42,7 @@
         </li>
       </ul>
 
-      <a href="#" class="btn btn-dark me-4">Entrar</a>
+      <a href="{% url 'login' %}" class="btn btn-dark me-4">Entrar</a>
     </div>
   </div>
 </nav>
@@ -76,7 +76,7 @@
     <a class="drawer-item">Sobre</a>
 
     <div class="p-3 mt-3">
-      <a class="btn btn-dark w-100">Entrar</a>
+      <a class="btn btn-dark">Entrar</a>
     </div>
   </div>
 </div>
