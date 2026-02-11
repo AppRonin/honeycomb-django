@@ -6,3 +6,6 @@ def home(request):
 
 def about(request):
     return render(request, 'automation/about.html')
+
+def gpon_conversor(request):
+    return render(request, 'automation/gpon_conversor.html')
