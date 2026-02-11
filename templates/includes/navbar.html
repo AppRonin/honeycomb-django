@@ -1,7 +1,7 @@
 {% load static %}
 
 <nav class="navbar navbar-expand-lg bg-body border-bottom p-3">
-  <div class="container-fluid">
+  <div class="container">
     <!-- Brand -->
     <a class="navbar-brand ms-3" href="#">
       <img src="{% static 'images/logo.svg' %}" width="36" height="36" />
@@ -42,7 +42,14 @@
         </li>
       </ul>
 
-      <a href="{% url 'login' %}" class="btn btn-dark me-4">Entrar</a>
+      {% if user.is_authenticated %}
+      <form method="post" action="{% url 'logout' %}" class="me-4">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-danger px-4">Sair</button>
+      </form>
+      {% else %}
+      <a href="{% url 'login' %}" class="btn btn-dark me-4 px-4">Entrar</a>
+      {% endif %}
     </div>
   </div>
 </nav>
@@ -76,7 +83,14 @@
     <a class="drawer-item">Sobre</a>
 
     <div class="p-3 mt-3">
-      <a class="btn btn-dark">Entrar</a>
+      {% if user.is_authenticated %}
+      <form method="post" action="{% url 'logout' %}">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-danger w-100">Sair</button>
+      </form>
+      {% else %}
+      <a class="btn btn-dark w-100">Entrar</a>
+      {% endif %}
     </div>
   </div>
 </div>
