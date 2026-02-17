@@ -23,9 +23,7 @@ def start_task(request):
 def get_progress(request, task_id):
     result = AsyncResult(task_id)
 
-    if result.state == "PENDING":
-        progress = 0
-    elif result.state == "PROGRESS":
+    if result.state == "PROGRESS":
         progress = result.info.get("progress", 0)
     elif result.state == "SUCCESS":
         progress = 100
