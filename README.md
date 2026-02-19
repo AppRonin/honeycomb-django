@@ -12,6 +12,14 @@ Built and actively used by a real telecom company in Brazil.
   </p>
 </div>
 
+## Architecture
+
+- 🐍 **Backend** → Django
+- ⚡ **Async Tasks** → Celery
+- 🧠 **Message Broker** → Redis
+- 🐘 **Database** → PostgreSQL
+- 🎨 **Frontend UI** → Bootstrap
+
 ## Getting Started
 
 ### 1️⃣ Clone the repository
