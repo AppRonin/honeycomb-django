@@ -72,21 +72,14 @@
 
       const response = await startTask();
 
-      if (response.error) {
-        errorBox.textContent = response.error;
-        startBtn.disabled = false;
-        return;
-      }
-
       const result = await getResult(response.task_id);
-
-      startBtn.disabled = false;
     } catch (err) {
       if (err.response) {
         const response = await err.response.json();
         errorBox.textContent = response.error;
-        startBtn.disabled = false;
       }
+    } finally {
+      startBtn.disabled = false;
     }
   });
 
@@ -131,17 +124,21 @@
     let progress = 0;
 
     while (progress < 100 && attempts < maxAttempts) {
-      let response = await getProgress(taskID);
+      try {
+        let response = await getProgress(taskID);
 
-      if (response.template) {
-        result = response.template;
+        if (response.template) {
+          result = response.template;
+        }
+
+        progress = response.progress;
+
+        // Filling Progress Bar
+        progressBar.style.width = progress + "%";
+        progressBar.textContent = progress + "%";
+      } catch (err) {
+        console.log(err);
       }
-
-      progress = response.progress;
-
-      // Filling Progress Bar
-      progressBar.style.width = progress + "%";
-      progressBar.textContent = progress + "%";
 
       attempts++;
       await sleep(1000);

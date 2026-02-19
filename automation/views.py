@@ -23,6 +23,9 @@ def gpon_conversor(request):
         uploaded_file = request.FILES.get("file")
         port = request.POST.get("port")
 
+        if not uploaded_file:
+            return JsonResponse({"error": "No file provided"}, status=400)
+
         if uploaded_file.size > MAX_FILE_SIZE:
             return JsonResponse({"error": "File too large. Max size is 2MB"}, status=400)
 
