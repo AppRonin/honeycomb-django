@@ -36,7 +36,9 @@
             </div>
           </form>
 
-          <div class="progress mt-3">
+          <p id="errorBox" class="text-danger mb-3"></p>
+
+          <div class="progress">
             <div
               id="progressBar"
               class="progress-bar"
@@ -52,32 +54,100 @@
   </div>
 </div>
 
-<script>
-  document.getElementById("startBtn").onclick = function (e) {
+<script type="module">
+  import ky from "https://cdn.jsdelivr.net/npm/ky@1.7.5/+esm";
+
+  const file = document.getElementById("file");
+  const port = document.getElementById("port");
+  const startBtn = document.getElementById("startBtn");
+  const errorBox = document.getElementById("errorBox");
+  const progressBar = document.getElementById("progressBar");
+
+  startBtn.addEventListener("click", async (e) => {
     e.preventDefault();
 
-    fetch("/start/")
-      .then((r) => r.json())
-      .then((data) => {
-        pollProgress(data.task_id);
-      });
-  };
+    try {
+      resetAll();
+      startBtn.disabled = true;
 
-  function pollProgress(taskId) {
-    const interval = setInterval(() => {
-      fetch(`/progress/${taskId}/`)
-        .then((r) => r.json())
-        .then((data) => {
-          const bar = document.getElementById("progressBar");
+      const response = await startTask();
 
-          bar.style.width = data.progress + "%";
-          bar.innerText = data.progress + "%";
+      if (response.error) {
+        errorBox.textContent = response.error;
+        startBtn.disabled = false;
+        return;
+      }
 
-          if (data.progress >= 100) {
-            clearInterval(interval);
-          }
-        });
-    }, 1000);
+      const result = await getResult(response.task_id);
+
+      startBtn.disabled = false;
+    } catch (err) {
+      if (err.response) {
+        const response = await err.response.json();
+        errorBox.textContent = response.error;
+        startBtn.disabled = false;
+      }
+    }
+  });
+
+  function resetAll() {
+    errorBox.textContent = "";
+
+    progressBar.style.width = "0%";
+    progressBar.textContent = "0%";
+  }
+
+  async function startTask() {
+    const formData = new FormData();
+    formData.append("file", file.files[0]);
+    formData.append("port", port.value);
+
+    const data = await ky
+      .post("{% url 'gpon_conversor' %}", {
+        body: formData,
+        headers: {
+          "X-CSRFToken": "{{ csrf_token }}",
+        },
+      })
+      .json();
+
+    return data;
+  }
+
+  async function getProgress(taskID) {
+    const data = await ky.get(`/progress/${taskID}/`).json();
+    return data;
+  }
+
+  function sleep(ms) {
+    return new Promise((resolve) => setTimeout(resolve, ms));
+  }
+
+  async function getResult(taskID) {
+    let attempts = 0;
+    const maxAttempts = 10;
+
+    let result = "";
+    let progress = 0;
+
+    while (progress < 100 && attempts < maxAttempts) {
+      let response = await getProgress(taskID);
+
+      if (response.template) {
+        result = response.template;
+      }
+
+      progress = response.progress;
+
+      // Filling Progress Bar
+      progressBar.style.width = progress + "%";
+      progressBar.textContent = progress + "%";
+
+      attempts++;
+      await sleep(1000);
+    }
+
+    return result;
   }
 </script>
 {% endblock %}
